@@ -1,0 +1,405 @@
+
+
+Docker commands:
+
+docker 
+
+docker --version
+
+docker info
+
+# ---------------------- help -------------------
+
+docker --help
+
+
+docker <> --help
+
+#----------- check the images ---------------
+e.g. docker images --help
+
+
+docker login
+
+docker pull ubuntu
+
+
+#------------ remove an image ------------
+docker rmi -f <image_id>
+
+
+#---------- check containers
+
+docker ps
+
+#-------- Pull an image form docker hub (hub.docker.com), create a sign in and pull any image
+e.g.
+
+docker pull ubuntu
+
+# ------ to run a containers------------
+
+# this command will check the image and run it , if not present download it
+
+docker run <image_name>
+
+# --- to check the running containers -------
+docker ps
+
+# ------------- run a container for an image 
+-i : for interactive
+-t : TTE
+
+docker run -it <image_name>
+
+e.g. docker run -it ubuntu
+
+You will enter in ubuntu sub system by this.
+
+# Start/Stop a container
+
+docker start <container_id>
+
+docker stop <container_id>
+
+
+# --- docker statistics -----
+
+# - memory, cpu, ram etc by each container
+docker stats
+
+# -- every usage of system by docker element e.g. docker images, container etc.
+
+docker system df
+
+
+#---- very careful to use this, as this will delete every container, images, network etc tha are not currenly in use
+
+docker system prune
+
+Images:
+
+docker pull ubuntu
+
+#----- pull image with tag(version)
+docker pull ubuntu:18.3
+
+# images id only
+docker images -q
+
+# ----- filter image with no containers yet ----
+
+docker images -f "dangling=false"
+
+# ------ images with container --------
+docker images -f "dangling=true"
+
+
+# Run a image 
+
+# this command create a container but not start it ----
+docker run <image_name>
+
+e.g. docker run ubuntu
+
+# ----- To create and start a container ----------
+
+docker run -it ubuntu
+
+#--- name a container, while create and run 
+
+docker run --name sk_container1 -it ubuntu
+
+# Inspect a image
+
+docker inspect image_name
+
+#---------------------------------
+
+Start:
+
+# pull and run an image to create a container
+
+docker run hello-world 
+
+# ------------- Jenkins (Sharing memory among container) --------------------
+Today we will learn :
+1. How to start Jenkins on Docker Container
+2. Start and Stop Jenkins Container
+3. How to set Jenkins home on Docker Volume and Host Machine
+: docker pull jenkins
+: docker run -p 8080:8080 -p 50000:50000 jenkins
+: docker run --name MyJenkins -p 8080:8080 -p 50000:50000 -v /Users/raghav/Desktop/Jenkins_Home:/var/jenkins_home jenkins
+: docker run --name MyJenkins2 -p 9090:8080 -p 50000:50000 -v /Users/raghav/Desktop/Jenkins_Home:/var/jenkins_home jenkins
+: docker volume create myjenkins
+: docker volume ls
+: docker volume inspect myjenkins
+: docker run --name MyJenkins3 -p 9090:8080 -p 50000:50000 -v myjenkins:/var/jenkins_home jenkins
+: docker inspect MyJenkins3
+In case you face issues like installing plugins on this Jenkins, can setup jenkins with this command:
+$ docker run -u root --rm -p 8080:8080 -v /srv/jenkins-data:/var/jenkins_home   -v /var/run/docker.sock:/var/run/docker.sock   --name jenkins jenkinsci/blueocean
+
+References
+https://hub.docker.com/
+
+A useful information by shared by Nilanjan Dutta: 
+Installed docker client binaries in the jenkins image, added the  jenkins user to the docker group and provided full permission to the docker.socket process..in case anyone finds this useful.
+
+# ----------- DockerFile ---------------------------
+1. What is Dockerfile
+2. How to create Dockerfile
+3. How to build image from Dockerfile
+4. Basic Commands
+
+TIPS & TRICKS
+
+Dockerfile : 
+A text file with instructions to build image
+Automation of Docker Image Creation
+
+FROM
+RUN
+CMD
+
+Step 1 : Create a file named Dockerfile
+
+Step 2 : Add instructions in Dockerfile
+
+Step 3 : Build dockerfile to create image
+
+Step 4 : Run image to create container
+
+COMMANDS
+: docker build 
+: docker build -t ImageName:Tag directoryOfDocekrfile
+
+: docker run image
+
+References:
+https://github.com/wsargent/docker-cheat-sheet#dockerfile
+https://docs.docker.com/engine/reference/builder/#environment-replacement
+
+# ------ multiple app on multi-container using docker-compose -----------------
+1. What | Why - Docker Compose
+2. How to install
+3. How to create docker compose file
+4. How to use docker compose file to create services
+5. Basic Commands
+
+TIPS
+Docker compose
+: tool for defining & running multi-container docker applications
+: use yaml files to configure application services (docker-compose.yml)
+: can start all services with a single command : docker compose up
+: can stop all services with a single command : docker compose down
+: can scale up selected services when required
+
+Step 1 : install docker compose
+   (already installed on windows and mac with docker)
+   docker-compose -v
+   
+   2 Ways
+
+   1.  https://github.com/docker/compose/rel...
+
+   2. Using PIP
+    pip install -U docker-compose
+
+Step 2 : Create docker compose file at any location on your system
+   docker-compose.yml
+
+Step 3 : Check the validity of file by command
+    docker-compose config
+
+Step 4 : Run docker-compose.yml file by command
+   docker-compose up -d
+
+Steps 5 : Bring down application by command
+   docker-compose down
+
+TIPS
+How to scale services
+
+—scale
+docker-compose up -d --scale database=4
+
+# ------------------ Docker volumes ---------------
+Today we will learn:
+1. What are Volumes
+2. How to create / list / delete volumes
+3. How to attach volume to a container
+4. How to share volume among containers
+5. What are bind mounts
+Volumes are the preferred mechanism for persisting data generated by and used by Docker containers
+
+: docker volume  //get information
+: docker volume create
+: docker volume ls
+: docker volume inspect
+: docker volume rm
+: docker volume prune
+
+Instead of deleting containers one by one of docker ps -a , we can use docker container prune.  and for docker ps (running containers) we can use  docker rm $(ps -aq)
+
+Use of Volumes
+===========
+Decoupling container from storage
+Share volume (storage/data) among different containers
+Attach volume to container
+On deleting container volume does not delete
+
+Commands
+docker run --name MyJenkins1 -v myvol1:/var/jenkins_home -p 8080:8080 -p 50000:50000 jenkins
+docker run --name MyJenkins2 -v myvol1:/var/jenkins_home -p 9090:8080 -p 60000:50000 jenkins
+docker run --name MyJenkins3 -v /Users/raghav/Desktop/Jenkins_Home:/var/jenkins_home -p 9191:8080 -p 40000:50000 jenkins
+
+References
+https://hub.docker.com/_/jenkins/
+https://docs.docker.com/storage/volumes/
+
+# ------------- docker orchestration -----------------
+
+1. What is Docker Swarm
+2. Why to use it
+3. How to create and manage Docker Swarm
+4. Create service on docker swarm
+5. Scaling services up and down
+6. Features/Helpful Tips
+A swarm is a group of machines that are running Docker and joined into a cluster 
+Docker Swarm is a tool for Container Orchestration
+
+Let’s take an example
+You have 100 containers
+You need to do 
+- Health check on every container
+- Ensure all containers are up on every system
+- Scaling the containers up or down depending on the load
+- Adding updates/changes to all the containers
+
+Orchestration - managing and controlling multiple docker containers as a single service
+Tools available - Docker Swarm, Kubernetes, Apache Mesos
+
+Pre-requisites
+1. Docker 1.13 or higher
+2. Docker Machine (pre installed for Docker for Windows and Docker for Mac)https://docs.docker.com/machine/insta...
+https://docs.docker.com/get-started/p...
+
+Step 1 :  Create Docker machines (to act as nodes for Docker Swarm)   Create one machine as manager and others as workers
+    docker-machine create --driver hyperv manager1    docker-machine create --driver virtualbox manager1
+
+   docker-machine:Error with pre-create check: “exit status 126”
+   https://stackoverflow.com/questions/3...
+   brew cask install virtualbox;
+
+   Create one manager machine
+   and other worker machines
+
+Step 2 :  Check machine created successfully
+    docker-machine ls
+    docker-machine ip manager1
+
+Step 3 :  SSH (connect) to docker machine
+    docker-machine ssh manager1
+
+Step 4 :  Initialize Docker Swarm    docker swarm init --advertise-addr MANAGER_IP
+    docker node ls
+    (this command will work only in swarm manager and not in worker)
+
+Step 5 :  Join workers in the swarm
+    Get command for joining as worker
+    In manager node run command
+    docker swarm join-token worker
+    This will give command to join swarm as worker
+
+    docker swarm join-token manager
+    This will give command to join swarm as manager
+
+    SSH into worker node (machine) and run command to join swarm as worker
+   
+    In Manager Run command - docker node ls to verify worker is registered and is ready
+  
+    Do this for all worker machines
+
+Step 6 :  On manager run standard docker commands
+    docker info
+    check the swarm section 
+    no of manager, nodes etc
+
+    Now check docker swarm command options 
+    docker swarm 
+
+Step 7 :  Run containers on Docker Swarm
+    docker service create --replicas 3 -p 80:80 --name serviceName nginx
+    Check the status:
+    docker service ls
+    docker service ps serviceName
+    Check the service running on all nodes
+    Check on the browser by giving ip for all nodes
+
+Step 8 :  Scale service up and down
+   On manager node 
+   docker service scale serviceName=2
+
+Inspecting Nodes (this command can run only on manager node)
+docker node inspect nodename
+docker node inspect self
+docker node inspect worker1
+
+Step 9 : Shutdown node
+   docker node update --availability drain worker1
+
+Step 10 :  Update service
+   docker service update --image imagename:version web
+   docker service update --image nginx:1.14.0 serviceName
+
+Step 11 :  Remove service
+   docker service rm serviceName
+docker swarm leave : to leave the swarm
+docker-machine stop machineName : to stop the machine
+docker-machine rm machineName : to remove the machine
+
+REFERENCES:
+https://docs.docker.com/get-started/p...
+https://rominirani.com/docker-swarm-t...
+
+FAQs & Helpful Tips:
+A swarm is a group of machines that are running Docker and joined into a cluster
+A cluster is managed by swarm manager
+The machines in a swarm can be physical or virtual. After joining a swarm, they are referred to as nodes
+Swarm managers are the only machines in a swarm that can execute your commands, or authorise other machines to join the swarm as workers
+
+Workers are just there to provide capacity and do not have the authority to tell any other machine what it can and cannot do
+
+you can have a node join as a worker or as a manager. At any point in time, there is only one LEADER and the other manager nodes 
+will be as backup in case the current LEADER opts out
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
